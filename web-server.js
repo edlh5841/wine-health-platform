@@ -16,6 +16,66 @@ const deposits = [
 const orders = [];
 let orderIdCounter = 1;
 
+// 体检报告数据存储
+const healthReports = [];
+let reportIdCounter = 1;
+
+// 体检报告数据模板
+const healthReportTemplate = {
+  // 基本信息
+  basicInfo: {
+    name: '',           // 姓名
+    gender: '',         // 性别
+    age: 0,             // 年龄
+    idCard: '',         // 身份证号
+    phone: '',          // 电话
+    reportDate: '',     // 报告日期
+    hospital: '',       // 体检医院
+  },
+  // 体格检查
+  physicalExam: {
+    height: 0,          // 身高(cm)
+    weight: 0,          // 体重(kg)
+    bmi: 0,             // BMI指数
+    bloodPressure: {    // 血压
+      systolic: 0,      // 收缩压
+      diastolic: 0,     // 舒张压
+    },
+    heartRate: 0,       // 心率
+  },
+  // 血液检查
+  bloodTest: {
+    bloodSugar: {       // 血糖
+      fasting: 0,       // 空腹血糖
+      postprandial: 0,  // 餐后血糖
+    },
+    bloodLipids: {      // 血脂
+      totalCholesterol: 0,    // 总胆固醇
+      triglycerides: 0,       // 甘油三酯
+      hdlCholesterol: 0,      // 高密度脂蛋白
+      ldlCholesterol: 0,      // 低密度脂蛋白
+    },
+    uricAcid: 0,        // 尿酸
+  },
+  // 肝功能
+  liverFunction: {
+    alt: 0,             // 谷丙转氨酶
+    ast: 0,             // 谷草转氨酶
+    totalBilirubin: 0,  // 总胆红素
+  },
+  // 肾功能
+  kidneyFunction: {
+    creatinine: 0,      // 肌酐
+    ureaNitrogen: 0,    // 尿素氮
+  },
+  // 结论
+  conclusion: {
+    summary: '',        // 体检总结
+    suggestions: '',    // 健康建议
+    doctor: '',         // 主检医师
+  }
+};
+
 // 管理后台 HTML - 简化版
 const adminHtml = `<!DOCTYPE html>
 <html>
@@ -209,6 +269,15 @@ const testPageHtml = `
       <p>账号: admin / 密码: admin123</p>
       <a href="/admin.html" target="_blank"><button class="btn">打开管理后台</button></a>
     </div>
+
+    <div class="card">
+      <h2>7. 体检报告上传</h2>
+      <input type="file" id="reportFile" accept=".pdf,.jpg,.png">
+      <button class="btn" onclick="uploadHealthReport()">上传并解析报告</button>
+      <div id="uploadResult" class="result"></div>
+      <button class="btn" onclick="loadHealthReports()" style="margin-top:10px">查看我的报告</button>
+      <div id="reportList"></div>
+    </div>
   </div>
 
   <script>
@@ -336,8 +405,107 @@ const testPageHtml = `
       }
     }
 
+    // 上传体检报告
+    async function uploadHealthReport() {
+      const result = document.getElementById('uploadResult');
+      const fileInput = document.getElementById('reportFile');
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        result.innerHTML = '<span class="error">请选择体检报告文件</span>';
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      result.textContent = '正在上传并解析...';
+      
+      try {
+        // 模拟上传，实际应该使用 FormData 上传文件
+        const uploadData = {
+          userId: 3,
+          fileName: file.name,
+          fileSize: file.size,
+          // 模拟一些体检数据（实际应该从OCR解析获取）
+          name: '张三',
+          gender: '男',
+          age: 45,
+          reportDate: '2026-02-20',
+          hospital: '市人民医院',
+          height: 175,
+          weight: 70,
+          bmi: 22.9,
+          systolic: 120,
+          diastolic: 80,
+          heartRate: 72,
+          fastingBloodSugar: 5.2,
+          postprandialBloodSugar: 7.1,
+          totalCholesterol: 4.5,
+          triglycerides: 1.2,
+          hdlCholesterol: 1.3,
+          ldlCholesterol: 2.8,
+          uricAcid: 350,
+          alt: 25,
+          ast: 28,
+          totalBilirubin: 15,
+          creatinine: 85,
+          ureaNitrogen: 5.2,
+          summary: '各项指标基本正常',
+          suggestions: '保持健康饮食，适量运动',
+          doctor: '李医生'
+        };
+        
+        const res = await fetch(API_BASE + '/api/health-report/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(uploadData)
+        });
+        const data = await res.json();
+        
+        if (data.code === 200) {
+          result.innerHTML = '<span class="success">✓ 报告上传成功</span>\n报告ID: ' + data.data.reportId;
+          // 自动刷新报告列表
+          loadHealthReports();
+        } else {
+          result.innerHTML = '<span class="error">✗ 上传失败: ' + data.message + '</span>';
+        }
+      } catch (err) {
+        result.innerHTML = '<span class="error">✗ 错误: ' + err.message + '</span>';
+      }
+    }
+    
+    // 加载体检报告列表
+    async function loadHealthReports() {
+      const container = document.getElementById('reportList');
+      container.innerHTML = '加载中...';
+      
+      try {
+        const res = await fetch(API_BASE + '/api/health-report/list?userId=3');
+        const data = await res.json();
+        
+        if (data.data && data.data.length > 0) {
+          container.innerHTML = data.data.map(r => {
+            const d = r.data;
+            return '<div class="tech-card" style="margin-top:10px">' +
+              '<div class="tech-info">' +
+              '<div class="tech-name">' + d.basicInfo.hospital + ' - ' + d.basicInfo.reportDate + '</div>' +
+              '<div class="tech-meta">姓名: ' + d.basicInfo.name + ' | 年龄: ' + d.basicInfo.age + '岁 | 性别: ' + d.basicInfo.gender + '</div>' +
+              '<div class="tech-meta">BMI: ' + d.physicalExam.bmi + ' | 血压: ' + d.physicalExam.bloodPressure.systolic + '/' + d.physicalExam.bloodPressure.diastolic + ' | 血糖: ' + d.bloodTest.bloodSugar.fasting + '</div>' +
+              '<div class="tech-meta" style="color:#52c41a">结论: ' + d.conclusion.summary + '</div>' +
+              '</div>' +
+              '</div>';
+          }).join('');
+        } else {
+          container.innerHTML = '<p style="color:#999">暂无体检报告</p>';
+        }
+      } catch (err) {
+        container.innerHTML = '<span class="error">加载失败: ' + err.message + '</span>';
+      }
+    }
+
     // 页面加载时自动测试健康检查
-    window.onload = testHealth;
+    window.onload = function() {
+      testHealth();
+      loadHealthReports();
+    };
   </script>
 </body>
 </html>
@@ -442,14 +610,111 @@ const server = http.createServer((req, res) => {
         order.orderStatus = 3;
         order.writeOffNo = 'WO' + Date.now();
       }
-      jsonResponse(res, { 
-        code: 200, 
-        data: { 
+      jsonResponse(res, {
+        code: 200,
+        data: {
           writeOffNo: order?.writeOffNo || 'WO202403150001',
           amount: order?.serviceAmount || 200
-        } 
+        }
       });
     });
+    return;
+  }
+
+  // 体检报告 - 获取数据模板
+  if (path === '/api/health-report/template' && method === 'GET') {
+    jsonResponse(res, { code: 200, data: healthReportTemplate });
+    return;
+  }
+
+  // 体检报告 - 上传并解析（模拟）
+  if (path === '/api/health-report/upload' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        // 模拟解析体检报告数据
+        const report = {
+          id: reportIdCounter++,
+          userId: data.userId || 3,
+          fileName: data.fileName || '体检报告.pdf',
+          uploadTime: new Date().toISOString(),
+          // 模拟解析的数据（实际应该调用OCR或PDF解析）
+          data: {
+            basicInfo: {
+              name: data.name || '张三',
+              gender: data.gender || '男',
+              age: data.age || 45,
+              reportDate: data.reportDate || '2026-02-20',
+              hospital: data.hospital || '市人民医院'
+            },
+            physicalExam: {
+              height: data.height || 175,
+              weight: data.weight || 70,
+              bmi: data.bmi || 22.9,
+              bloodPressure: {
+                systolic: data.systolic || 120,
+                diastolic: data.diastolic || 80
+              },
+              heartRate: data.heartRate || 72
+            },
+            bloodTest: {
+              bloodSugar: {
+                fasting: data.fastingBloodSugar || 5.2,
+                postprandial: data.postprandialBloodSugar || 7.1
+              },
+              bloodLipids: {
+                totalCholesterol: data.totalCholesterol || 4.5,
+                triglycerides: data.triglycerides || 1.2,
+                hdlCholesterol: data.hdlCholesterol || 1.3,
+                ldlCholesterol: data.ldlCholesterol || 2.8
+              },
+              uricAcid: data.uricAcid || 350
+            },
+            liverFunction: {
+              alt: data.alt || 25,
+              ast: data.ast || 28,
+              totalBilirubin: data.totalBilirubin || 15
+            },
+            kidneyFunction: {
+              creatinine: data.creatinine || 85,
+              ureaNitrogen: data.ureaNitrogen || 5.2
+            },
+            conclusion: {
+              summary: data.summary || '各项指标基本正常',
+              suggestions: data.suggestions || '保持健康饮食，适量运动',
+              doctor: data.doctor || '李医生'
+            }
+          },
+          status: 'parsed' // uploaded, parsing, parsed, error
+        };
+        healthReports.push(report);
+        jsonResponse(res, { code: 200, data: { reportId: report.id, message: '报告上传并解析成功' } });
+      } catch (err) {
+        jsonResponse(res, { code: 500, message: '解析失败: ' + err.message });
+      }
+    });
+    return;
+  }
+
+  // 体检报告 - 获取用户报告列表
+  if (path === '/api/health-report/list' && method === 'GET') {
+    const userId = parsedUrl.query.userId || 3;
+    const userReports = healthReports.filter(r => r.userId == userId);
+    jsonResponse(res, { code: 200, data: userReports });
+    return;
+  }
+
+  // 体检报告 - 获取单条报告详情
+  if (path.startsWith('/api/health-report/') && method === 'GET') {
+    const reportId = path.split('/')[3];
+    const report = healthReports.find(r => r.id == reportId);
+    if (report) {
+      jsonResponse(res, { code: 200, data: report });
+    } else {
+      jsonResponse(res, { code: 404, message: '报告不存在' });
+    }
     return;
   }
 
