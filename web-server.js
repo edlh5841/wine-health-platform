@@ -240,16 +240,7 @@ const testPageHtml = `
         
         container.innerHTML = data.data.map(t => {
           select.innerHTML += '<option value="' + t.id + '">' + t.realName + '</option>';
-          return '
-            <div class="tech-card">
-              <div class="tech-avatar">' + t.realName[0] + '</div>
-              <div class="tech-info">
-                <div class="tech-name">' + t.realName + ' <span class="status ' + (t.onlineStatus ? 'online' : '') + '">' + (t.onlineStatus ? '在线' : '离线') + '</span></div>
-                <div class="tech-meta">⭐ ' + t.ratingScore + '分 | ' + t.workYears + '年经验 | 已服务' + t.orderCount + '人</div>
-              </div>
-              <div class="price">¥' + (t.ratingScore * 60).toFixed(0) + '/时</div>
-            </div>
-          ';
+          return '<div class="tech-card"><div class="tech-avatar">' + t.realName[0] + '</div><div class="tech-info"><div class="tech-name">' + t.realName + ' <span class="status ' + (t.onlineStatus ? 'online' : '') + '">' + (t.onlineStatus ? '在线' : '离线') + '</span></div><div class="tech-meta">⭐ ' + t.ratingScore + '分 | ' + t.workYears + '年经验 | 已服务' + t.orderCount + '人</div></div><div class="price">¥' + (t.ratingScore * 60).toFixed(0) + '/时</div></div>';
         }).join('');
       } catch (err) {
         container.innerHTML = '<span class="error">加载失败: ' + err.message + '</span>';
@@ -269,14 +260,7 @@ const testPageHtml = `
         
         container.innerHTML = data.data.map(d => {
           select.innerHTML += '<option value="' + d.id + '">' + d.productName + ' (库存' + d.availableQuantity + 'ml)</option>';
-          return '
-            <div class="tech-card">
-              <div class="tech-info">
-                <div class="tech-name">' + d.productName + '</div>
-                <div class="tech-meta">批次: ' + d.batchNo + ' | 库存: ' + d.availableQuantity + 'ml</div>
-              </div>
-            </div>
-          ';
+          return '<div class="tech-card"><div class="tech-info"><div class="tech-name">' + d.productName + '</div><div class="tech-meta">批次: ' + d.batchNo + ' | 库存: ' + d.availableQuantity + 'ml</div></div></div>';
         }).join('');
       } catch (err) {
         container.innerHTML = '<span class="error">加载失败: ' + err.message + '</span>';
