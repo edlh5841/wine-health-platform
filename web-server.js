@@ -351,9 +351,6 @@ async function loadTechnicians() {
     document.getElementById('techListBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">加载失败</td></tr>';
   }
 }
-    document.getElementById('techListBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">加载失败</td></tr>';
-  }
-}
 
 async function loadOrders() {
   try {
