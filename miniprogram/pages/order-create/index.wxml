@@ -1,0 +1,97 @@
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="nav-bar">
+    <text class="back" bindtap="goBack">←</text>
+    <text class="title">确认订单</text>
+    <text class="service">?客服</text>
+  </view>
+
+  <!-- 技师信息卡片 -->
+  <view class="card tech-card">
+    <view class="card-header">
+      <text class="card-title">🏪 服务信息</text>
+    </view>
+    
+    <view class="tech-info-row">
+      <text class="label">技师：</text>
+      <text class="value">{{technician.realName}} (V{{technician.workYears > 5 ? 5 : technician.workYears}}等级)</text>
+    </view>
+    
+    <view class="tech-info-row">
+      <text class="label">服务：</text>
+      <text class="value">推拿（{{duration}}分钟）</text>
+    </view>
+    
+    <view class="tech-info-row">
+      <text class="label">预估用量：</text>
+      <text class="value">{{predictQuantity}}ml</text>
+    </view>
+  </view>
+
+  <!-- 酒品选择 -->
+  <view class="card deposit-card">
+    <view class="card-header">
+      <text class="card-title">📦 选择托管酒品</text>
+    </view>
+    
+    <view class="deposit-list">
+      <view class="deposit-item {{depositIndex === index ? 'selected' : ''}}" 
+            wx:for="{{depositBatches}}" wx:key="id" 
+            bindtap="selectDeposit" data-index="{{index}}">
+        <view class="radio {{depositIndex === index ? 'checked' : ''}}"></view>
+        
+        <view class="deposit-info">
+          <text class="deposit-name">{{item.productName}}</text>
+          <text class="deposit-batch">批次：{{item.batchNo}}</text>
+          <text class="deposit-stock">库存：{{item.availableQuantity}}ml</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预估用量 -->
+  <view class="card quantity-card">
+    <view class="card-header">
+      <text class="card-title">📊 预估用量 (ml)</text>
+    </view>
+    
+    <input class="quantity-input" type="number" value="{{predictQuantity}}" 
+           bindinput="onQuantityChange" placeholder="请输入用量" />
+  </view>
+
+  <!-- 费用明细 -->
+  <view class="card amount-card">
+    <view class="card-header">
+      <text class="card-title">💰 费用明细</text>
+    </view>
+    
+    <view class="amount-row">
+      <text class="amount-label">服务费用：</text>
+      <text class="amount-value">¥ {{orderAmount}}</text>
+    </view>
+    
+    <view class="amount-row highlight">
+      <text class="amount-label">新人优惠：</text>
+      <text class="amount-value discount">-¥ 50.00</text>
+    </view>
+    
+    <view class="amount-row">
+      <text class="amount-label">预估个税：</text>
+      <text class="amount-value">-¥ {{(orderAmount * 0.12).toFixed(2)}}</text>
+    </view>
+    
+    <view class="divider"></view>
+    
+    <view class="amount-row total">
+      <text class="amount-label">实付金额：</text>
+      <text class="amount-value total-price">¥ {{(orderAmount - 50).toFixed(2)}}</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="footer">
+    <button class="btn-primary submit-btn" bindtap="submitOrder" loading="{{submitting}}">
+      立即下单并支付
+    </button>
+  </view>
+</view>

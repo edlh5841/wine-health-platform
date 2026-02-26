@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>保健酒平台 - 管理后台</title>
+  <!-- Element Plus CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-plus@2.5.0/dist/index.css">
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3.4.0/dist/vue.global.js"></script>
+  <!-- Element Plus JS -->
+  <script src="https://unpkg.com/element-plus@2.5.0/dist/index.full.js"></script>
+  <!-- Element Plus Icons -->
+  <script src="https://unpkg.com/@element-plus/icons-vue@2.3.0/dist/index.iife.min.js"></script>
+  <!-- ECharts -->
+  <script src="https://unpkg.com/echarts@5.4.0/dist/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    .layout { height: 100vh; }
+    .sidebar { background: #304156; width: 200px; }
+    .logo { height: 60px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: bold; border-bottom: 1px solid #1f2d3d; }
+    .header { background: #fff; box-shadow: 0 1px 4px rgba(0,21,41,0.08); display: flex; align-items: center; justify-content: flex-end; padding: 0 20px; }
+    .main { background: #f0f2f5; padding: 20px; overflow-y: auto; }
+    .metric-card { margin-bottom: 20px; }
+    .card-content { display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-size: 14px; color: #909399; margin: 0 0 10px; }
+    .card-value { font-size: 28px; font-weight: bold; color: #303133; margin: 0; }
+    .card-icon { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .chart-row { margin-top: 20px; }
+    .login-container { height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .login-box { width: 400px; padding: 40px; background: #fff; border-radius: 8px; text-align: center; }
+    .login-box h2 { color: #C53D13; margin-bottom: 10px; }
+    .tips { margin-top: 20px; color: #999; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+    const { ElMessage } = ElementPlus;
+
+    // API 基础地址
+    const API_BASE = 'http://localhost:8080';
+
+    // 登录组件
+    const Login = {
+      template: `
+        <div class="login-container">
+          <div class="login-box">
+            <h2>🍷 保健酒平台</h2>
+            <p>管理后台登录</p>
+            <el-input v-model="form.username" placeholder="用户名" style="margin-bottom: 15px;">
+              <template #prefix><el-icon><User /></el-icon></template>
+            </el-input>
+            <el-input v-model="form.password" type="password" placeholder="密码" style="margin-bottom: 20px;">
+              <template #prefix><el-icon><Lock /></el-icon></template>
+            </el-input>
+            <el-button type="primary" @click="handleLogin" style="width: 100%">登录</el-button>
+            <p class="tips">测试账号：admin / admin123</p>
+          </div>
+        </div>
+      `,
+      setup() {
+        const form = ref({ username: '', password: '' });
+        const handleLogin = () => {
+          if (form.value.username === 'admin' && form.value.password === 'admin123') {
+            ElMessage.success('登录成功');
+            localStorage.setItem('isLogin', 'true');
+            window.location.hash = '/';
+          } else {
+            ElMessage.error('用户名或密码错误');
+          }
+        };
+        return { form, handleLogin };
+      }
+    };
+
+    // 数据大屏组件
+    const Dashboard = {
+      template: `
+        <div>
+          <el-row :gutter="20">
+            <el-col :span="6" v-for="card in metricCards" :key="card.title">
+              <el-card class="metric-card" :style="{ borderLeft: '4px solid ' + card.color }">
+                <div class="card-content">
+                  <div>
+                    <p class="card-title">{{ card.title }}</p>
+                    <p class="card-value">{{ card.value }}</p>
+                  </div>
+                  <div class="card-icon" :style="{ backgroundColor: card.color + '20' }">
+                    <el-icon :size="32" :color="card.color"><component :is="card.icon" /></el-icon>
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="20" class="chart-row">
+            <el-col :span="12">
+              <el-card>
+                <template #header>GMV趋势（今日）</template>
+                <div ref="gmvChart" style="height: 300px;"></div>
+              </el-card>
+            </el-col>
+            <el-col :span="12">
+              <el-card>
+                <template #header>技师收入TOP10</template>
+                <div ref="rankChart" style="height: 300px;"></div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <el-card style="margin-top: 20px;">
+            <template #header>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>实时订单流</span>
+                <el-tag type="success">● 实时更新</el-tag>
+              </div>
+            </template>
+            <el-table :data="orders" style="width: 100%">
+              <el-table-column prop="time" label="时间" width="100" />
+              <el-table-column prop="orderNo" label="订单号" />
+              <el-table-column prop="amount" label="金额">
+                <template #default="{ row }">
+                  <span style="color: #C53D13; font-weight: bold;">¥{{ row.amount }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="status" label="状态">
+                <template #default="{ row }">
+                  <el-tag :type="row.statusType">{{ row.status }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="area" label="区域" />
+            </el-table>
+          </el-card>
+        </div>
+      `,
+      setup() {
+        const gmvChart = ref(null);
+        const rankChart = ref(null);
+        const metricCards = ref([
+          { title: '今日GMV', value: '¥125,680', icon: 'Money', color: '#C53D13' },
+          { title: '今日订单', value: '256', icon: 'ShoppingCart', color: '#52C41A' },
+          { title: '活跃技师', value: '48', icon: 'User', color: '#1890FF' },
+          { title: '库存预警', value: '3', icon: 'Warning', color: '#FAAD14' }
+        ]);
+        const orders = ref([
+          { time: '14:32', orderNo: 'W202403150001', amount: 300, status: '已完成', statusType: 'success', area: '朝阳区' },
+          { time: '14:28', orderNo: 'W202403150002', amount: 350, status: '服务中', statusType: 'primary', area: '海淀区' },
+          { time: '14:25', orderNo: 'W202403150003', amount: 280, status: '待服务', statusType: 'warning', area: '东城区' }
+        ]);
+
+        onMounted(() => {
+          const gmvChartInstance = echarts.init(gmvChart.value);
+          gmvChartInstance.setOption({
+            xAxis: { type: 'category', data: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'] },
+            yAxis: { type: 'value' },
+            series: [{
+              data: [12000, 15000, 28000, 45000, 68000, 125680],
+              type: 'line', smooth: true,
+              areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [
+                { offset: 0, color: 'rgba(197, 61, 19, 0.3)' },
+                { offset: 1, color: 'rgba(197, 61, 19, 0.05)' }
+              ]}}
+            }]
+          });
+
+          const rankChartInstance = echarts.init(rankChart.value);
+          rankChartInstance.setOption({
+            xAxis: { type: 'value' },
+            yAxis: { type: 'category', data: ['张师傅', '李师傅', '王师傅', '赵师傅', '刘师傅'] },
+            series: [{ type: 'bar', data: [8960, 7520, 6890, 5230, 4560], itemStyle: { color: '#C53D13' } }]
+          });
+        });
+
+        return { metricCards, orders, gmvChart, rankChart };
+      }
+    };
+
+    // 主布局组件
+    const MainLayout = {
+      components: { Dashboard },
+      template: `
+        <el-container class="layout">
+          <el-aside class="sidebar">
+            <div class="logo">🍷 保健酒平台</div>
+            <el-menu :default-active="activeMenu" @select="handleSelect" background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
+              <el-menu-item index="dashboard">
+                <el-icon><DataLine /></el-icon>
+                <span>数据大屏</span>
+              </el-menu-item>
+              <el-menu-item index="orders">
+                <el-icon><List /></el-icon>
+                <span>订单管理</span>
+              </el-menu-item>
+              <el-menu-item index="technicians">
+                <el-icon><User /></el-icon>
+                <span>技师管理</span>
+              </el-menu-item>
+              <el-menu-item index="splits">
+                <el-icon><Money /></el-icon>
+                <span>分账统计</span>
+              </el-menu-item>
+            </el-menu>
+          </el-aside>
+          
+          <el-container>
+            <el-header class="header">
+              <el-dropdown>
+                <span style="cursor: pointer;">管理员 <el-icon><ArrowDown /></el-icon></span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-header>
+            
+            <el-main class="main">
+              <Dashboard v-if="activeMenu === 'dashboard'" />
+              <div v-else style="text-align: center; padding: 100px; color: #999;">
+                <h2>{{ menuTitle }} 功能开发中...</h2>
+              </div>
+            </el-main>
+          </el-container>
+        </el-container>
+      `,
+      setup() {
+        const activeMenu = ref('dashboard');
+        const menuTitles = { orders: '订单管理', technicians: '技师管理', splits: '分账统计' };
+        const menuTitle = ref('');
+        
+        const handleSelect = (index) => {
+          activeMenu.value = index;
+          menuTitle.value = menuTitles[index] || '';
+        };
+        
+        const logout = () => {
+          localStorage.removeItem('isLogin');
+          window.location.hash = '/login';
+        };
+        
+        return { activeMenu, menuTitle, handleSelect, logout };
+      }
+    };
+
+    // 路由处理
+    const App = {
+      setup() {
+        const currentRoute = ref(window.location.hash.slice(1) || '/');
+        
+        window.addEventListener('hashchange', () => {
+          currentRoute.value = window.location.hash.slice(1) || '/';
+        });
+        
+        const isLogin = () => localStorage.getItem('isLogin') === 'true';
+        
+        return { currentRoute, isLogin };
+      },
+      template: `
+        <Login v-if="currentRoute === '/login' || !isLogin()" />
+        <MainLayout v-else />
+      `
+    };
+
+    const app = createApp(App);
+    app.use(ElementPlus);
+    for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+      app.component(key, component);
+    }
+    app.mount('#app');
+  </script>
+</body>
+</html>

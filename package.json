@@ -1,0 +1,17 @@
+{
+  "name": "wine-health-platform",
+  "version": "1.0.0",
+  "description": "保健酒托管服务平台",
+  "main": "web-server.js",
+  "scripts": {
+    "start": "node web-server.js",
+    "dev": "node web-server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "keywords": ["wine", "health", "platform"],
+  "author": "Kimi Claw",
+  "license": "MIT"
+}

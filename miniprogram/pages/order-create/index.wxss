@@ -1,0 +1,193 @@
+/* 下单页样式 */
+.container {
+  min-height: 100vh;
+  padding: 32rpx;
+  padding-bottom: 160rpx;
+  background: #F8F5F2;
+}
+
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  margin-bottom: 24rpx;
+}
+
+.back, .service {
+  font-size: 32rpx;
+  color: #666666;
+  padding: 16rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 24rpx rgba(197, 61, 19, 0.08);
+}
+
+.card-header {
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.tech-info-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.tech-info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666666;
+  width: 160rpx;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.deposit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.deposit-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.deposit-item.selected {
+  border-color: #C53D13;
+  background: rgba(197, 61, 19, 0.05);
+}
+
+.radio {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #CCCCCC;
+  border-radius: 50%;
+  margin-right: 24rpx;
+  position: relative;
+}
+
+.radio.checked {
+  border-color: #C53D13;
+  background: #C53D13;
+}
+
+.radio.checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16rpx;
+  height: 16rpx;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+.deposit-info {
+  flex: 1;
+}
+
+.deposit-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.deposit-batch, .deposit-stock {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.quantity-input {
+  width: 100%;
+  height: 88rpx;
+  background: #F8F5F2;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+}
+
+.amount-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.amount-value {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.amount-value.discount {
+  color: #52C41A;
+}
+
+.amount-row.total {
+  padding-top: 24rpx;
+}
+
+.total-price {
+  font-size: 40rpx;
+  color: #C53D13;
+  font-weight: 600;
+}
+
+.divider {
+  height: 1rpx;
+  background: #E5E5E5;
+  margin: 16rpx 0;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32rpx;
+  background: #FFFFFF;
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.05);
+}
+
+.submit-btn {
+  width: 100% !important;
+  margin: 0 !important;
+}

@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="scan-area" bindtap="scanQRCode">
+    <text class="icon">📷</text>
+    <text class="tip">点击扫码核销</text>
+  </view>
+
+  <view class="result" wx:if="{{result}}">
+    <text class="title">{{result.title}}</text>
+    <text class="message">{{result.message}}</text>
+  </view>
+</view>

@@ -1,0 +1,62 @@
+<view class="container">
+  <!-- 顶部品牌区 -->
+  <view class="header">
+    <text class="brand-title">🍷 尊享保健酒服务</text>
+    <text class="brand-subtitle">专业技师 · 正品保障</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-box">
+    <view class="search-input">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索技师（姓名/地区）</text>
+    </view>
+  </view>
+
+  <!-- 位置信息 -->
+  <view class="location-bar">
+    <text class="location-icon">📍</text>
+    <text class="location-text">当前：北京市朝阳区</text>
+  </view>
+
+  <!-- 技师列表 -->
+  <view class="section-title">👨‍⚕️ 推荐技师</view>
+  
+  <view class="tech-list">
+    <view class="tech-card" wx:for="{{technicians}}" wx:key="id" bindtap="selectTech" data-id="{{item.id}}">
+      <view class="tech-header">
+        <image class="tech-avatar" src="{{item.avatar || '/images/avatar-default.png'}}" />
+        <view class="tech-info">
+          <view class="tech-name-row">
+            <text class="tech-name">{{item.realName}}</text>
+            <view class="tag tag-gold">🏆 V{{item.workYears > 5 ? 5 : item.workYears}}等级</view>
+          </view>
+          
+          <view class="tech-meta">
+            <text class="rating">⭐ {{item.ratingScore}}</text>
+            <text class="divider">|</text>
+            <text class="experience">{{item.workYears}}年经验</text>
+            <text class="divider">|</text>
+            <text class="orders">已服务{{item.orderCount}}人</text>
+          </view>
+          
+          <view class="tech-location">
+            <text class="location-text">📍 朝阳区（距您{{(Math.random()*5).toFixed(1)}}km）</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="tech-footer">
+        <text class="price">💰 {{(item.ratingScore * 60).toFixed(0)}}元/小时</text>
+        <view class="status-badge {{item.onlineStatus === 1 ? 'online' : 'offline'}}">
+          {{item.onlineStatus === 1 ? '在线' : '离线'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新人优惠 -->
+  <view class="promo-banner">
+    <text class="promo-text">🎁 新人专享首单立减50元</text>
+  </view>
+</view>

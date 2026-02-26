@@ -1,0 +1,95 @@
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="nav-bar">
+    <text class="back" bindtap="goBack">←</text>
+    <text class="title">技师详情</text>
+    <text class="action">❤️收藏</text>
+  </view>
+
+  <!-- 技师信息区 -->
+  <view class="tech-header">
+    <image class="tech-avatar-large" src="{{technician.avatar || '/images/avatar-default.png'}}" />
+    <text class="tech-name-large">{{technician.realName}}</text>
+    
+    <view class="tech-rating">
+      <text class="stars">⭐⭐⭐⭐⭐</text>
+      <text class="rating-score">{{technician.ratingScore}}分</text>
+    </view>
+    
+    <view class="tech-tags">
+      <view class="tag tag-gold">🏆 V{{technician.workYears > 5 ? 5 : technician.workYears}}等级</view>
+      <view class="tag">✓ 实名认证</view>
+      <view class="tag">✓ 专业认证</view>
+    </view>
+  </view>
+
+  <!-- 统计数据 -->
+  <view class="stats-bar">
+    <view class="stat">
+      <text class="stat-num">{{technician.ratingScore}}</text>
+      <text class="stat-label">综合评分</text>
+    </view>
+    <view class="stat">
+      <text class="stat-num">{{technician.workYears}}年</text>
+      <text class="stat-label">从业经验</text>
+    </view>
+    <view class="stat">
+      <text class="stat-num">{{technician.orderCount}}</text>
+      <text class="stat-label">服务人数</text>
+    </view>
+  </view>
+
+  <!-- 服务价格 -->
+  <view class="section">
+    <view class="section-title">💰 服务价格</view>
+    
+    <view class="price-list">
+      <view class="price-item">
+        <text class="service-name">推拿按摩</text>
+        <view class="service-info">
+          <text class="service-price">¥300/小时</text>
+          <text class="service-usage">约200ml用量</text>
+        </view>
+      </view>
+      
+      <view class="price-item">
+        <text class="service-name">理疗养生</text>
+        <view class="service-info">
+          <text class="service-price">¥350/小时</text>
+          <text class="service-usage">约250ml用量</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务范围 -->
+  <view class="section">
+    <view class="section-title">📍 服务范围</text>
+    <text class="service-area">朝阳区、东城区、西城区</text>
+  </view>
+
+  <!-- 用户评价 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">💬 用户评价 (256条)</text>
+      <text class="more">查看全部 ></text>
+    </view>
+    
+    <view class="review-item">
+      <view class="review-header">
+        <text class="reviewer">用户A</text>
+        <text class="review-stars">⭐⭐⭐⭐⭐</text>
+      </view>
+      <text class="review-content">技术专业，服务周到，强烈推荐！</text>
+      <text class="review-time">2024-03-15</text>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <button class="btn-primary book-btn" bindtap="bookNow">
+      立即预约
+      <text class="btn-sub">（新用户立减50元）</text>
+    </button>
+  </view>
+</view>
