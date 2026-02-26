@@ -461,7 +461,7 @@ const testPageHtml = `
         const data = await res.json();
         
         if (data.code === 200) {
-          result.innerHTML = '<span class="success">✓ 报告上传成功</span>\n报告ID: ' + data.data.reportId;
+          result.innerHTML = '<span class="success">✓ 报告上传成功</span> 报告ID: ' + data.data.reportId;
           // 自动刷新报告列表
           loadHealthReports();
         } else {
