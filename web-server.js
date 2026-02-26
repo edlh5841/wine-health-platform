@@ -137,6 +137,7 @@ th { background: #fafafa; font-weight: 600; color: #666; }
       <div class="menu-item active" onclick="showPage('dashboard')">📊 数据概览</div>
       <div class="menu-item" onclick="showPage('technicians')">👨‍⚕️ 技师管理</div>
       <div class="menu-item" onclick="showPage('orders')">📋 订单管理</div>
+      <div class="menu-item" onclick="showPage('deposits')">🍷 库存管理</div>
       <div class="menu-item" onclick="showPage('reports')">📄 体检报告</div>
       <div class="menu-item" onclick="doLogout()">🚪 退出登录</div>
     </div>
@@ -168,11 +169,48 @@ th { background: #fafafa; font-weight: 600; color: #666; }
     <!-- 技师管理 -->
     <div class="page-section" id="technicians">
       <div class="content-card">
-        <h3>技师列表</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3>技师列表</h3>
+          <button class="btn btn-primary" onclick="showTechForm()">+ 添加技师</button>
+        </div>
         <table>
-          <thead><tr><th>ID</th><th>姓名</th><th>工号</th><th>评分</th><th>订单数</th><th>余额</th><th>状态</th></tr></thead>
-          <tbody id="techListBody"><tr><td colspan="7" style="text-align:center;color:#999">加载中...</td></tr></tbody>
+          <thead><tr><th>ID</th><th>姓名</th><th>工号</th><th>评分</th><th>订单数</th><th>余额</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="techListBody"><tr><td colspan="8" style="text-align:center;color:#999">加载中...</td></tr></tbody>
         </table>
+      </div>
+    </div>
+    
+    <!-- 技师添加/编辑表单 -->
+    <div class="page-section" id="techForm">
+      <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3 id="techFormTitle">添加技师</h3>
+          <button class="btn btn-default" onclick="showPage('technicians')">返回列表</button>
+        </div>
+        <form id="techFormElement" onsubmit="saveTech(event)">
+          <input type="hidden" id="techId">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-bottom:20px">
+            <div><label>姓名</label><input type="text" id="techName" required style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>工号</label><input type="text" id="techCertNo" required style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>工作年限</label><input type="number" id="techWorkYears" value="1" min="0" style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>评分</label><input type="number" id="techRating" value="5.0" min="0" max="5" step="0.1" style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>电话</label><input type="text" id="techPhone" style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>状态</label><select id="techStatus" style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"><option value="1">在线</option><option value="0">离线</option></select></div>
+          </div>
+          <button type="submit" class="btn btn-primary">保存</button>
+          <button type="button" class="btn btn-default" onclick="showPage('technicians')" style="margin-left:10px">取消</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 技师详情 -->
+    <div class="page-section" id="techDetail">
+      <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3>技师详情</h3>
+          <button class="btn btn-default" onclick="showPage('technicians')">返回列表</button>
+        </div>
+        <div id="techDetailContent">加载中...</div>
       </div>
     </div>
     
@@ -184,6 +222,52 @@ th { background: #fafafa; font-weight: 600; color: #666; }
           <thead><tr><th>订单号</th><th>客户ID</th><th>技师</th><th>金额</th><th>状态</th><th>创建时间</th></tr></thead>
           <tbody id="orderListBody"><tr><td colspan="6" style="text-align:center;color:#999">加载中...</td></tr></tbody>
         </table>
+      </div>
+    </div>
+    
+    <!-- 库存管理 -->
+    <div class="page-section" id="deposits">
+      <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3>托管库存列表</h3>
+          <button class="btn btn-primary" onclick="showDepositForm()">+ 添加库存</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>批次号</th><th>用户ID</th><th>商品</th><th>总量</th><th>可用</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="depositListBody"><tr><td colspan="8" style="text-align:center;color:#999">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 库存添加/编辑表单 -->
+    <div class="page-section" id="depositForm">
+      <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3 id="depositFormTitle">添加库存</h3>
+          <button class="btn btn-default" onclick="showPage('deposits')">返回列表</button>
+        </div>
+        <form id="depositFormElement" onsubmit="saveDeposit(event)">
+          <input type="hidden" id="depositId">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-bottom:20px">
+            <div><label>用户ID</label><input type="number" id="depositUserId" value="3" required style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>商品名称</label><input type="text" id="depositProductName" required style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>总量(ml)</label><input type="number" id="depositQuantity" value="500" min="1" required style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"></div>
+            <div><label>状态</label><select id="depositStatus" style="width:100%;padding:10px;margin-top:5px;border:1px solid #d9d9d9;border-radius:4px"><option value="2">正常</option><option value="1">冻结</option><option value="0">已用完</option></select></div>
+          </div>
+          <button type="submit" class="btn btn-primary">保存</button>
+          <button type="button" class="btn btn-default" onclick="showPage('deposits')" style="margin-left:10px">取消</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- 库存详情 -->
+    <div class="page-section" id="depositDetail">
+      <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3>库存详情</h3>
+          <button class="btn btn-default" onclick="showPage('deposits')">返回列表</button>
+        </div>
+        <div id="depositDetailContent">加载中...</div>
       </div>
     </div>
     
@@ -224,13 +308,14 @@ function showPage(page) {
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   document.getElementById(page).classList.add('active');
   document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  const titles = { dashboard: '数据概览', technicians: '技师管理', orders: '订单管理', reports: '体检报告' };
-  document.getElementById('pageTitle').textContent = titles[page];
-  
+  if (event && event.target) event.target.classList.add('active');
+
+  const titles = { dashboard: '数据概览', technicians: '技师管理', orders: '订单管理', deposits: '库存管理', reports: '体检报告', techForm: '技师管理', techDetail: '技师管理', depositForm: '库存管理', depositDetail: '库存管理' };
+  document.getElementById('pageTitle').textContent = titles[page] || '管理后台';
+
   if (page === 'technicians') loadTechnicians();
   if (page === 'orders') loadOrders();
+  if (page === 'deposits') loadDeposits();
   if (page === 'reports') loadReports();
 }
 
@@ -258,11 +343,14 @@ async function loadTechnicians() {
     const data = await res.json();
     const tbody = document.getElementById('techListBody');
     if (data.data && data.data.length > 0) {
-      tbody.innerHTML = data.data.map(t => '<tr><td>' + t.id + '</td><td>' + t.realName + '</td><td>' + t.certNo + '</td><td>' + t.ratingScore + '</td><td>' + t.orderCount + '</td><td>¥' + t.balance + '</td><td><span class="badge ' + (t.onlineStatus ? 'badge-success' : 'badge-default') + '">' + (t.onlineStatus ? '在线' : '离线') + '</span></td></tr>').join('');
+      tbody.innerHTML = data.data.map(t => '<tr><td>' + t.id + '</td><td>' + t.realName + '</td><td>' + t.certNo + '</td><td>' + t.ratingScore + '</td><td>' + t.orderCount + '</td><td>¥' + t.balance + '</td><td><span class="badge ' + (t.onlineStatus ? 'badge-success' : 'badge-default') + '">' + (t.onlineStatus ? '在线' : '离线') + '</span></td><td><button class="btn btn-primary" onclick="editTech(' + t.id + ')">编辑</button><button class="btn btn-default" onclick="viewTech(' + t.id + ')">详情</button><button class="btn btn-danger" onclick="deleteTech(' + t.id + ')" style="background:#ff4d4f;color:#fff">删除</button></td></tr>').join('');
     } else {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">暂无数据</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">暂无数据</td></tr>';
     }
   } catch (e) {
+    document.getElementById('techListBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">加载失败</td></tr>';
+  }
+}
     document.getElementById('techListBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">加载失败</td></tr>';
   }
 }
@@ -299,6 +387,200 @@ async function loadReports() {
 
 function viewReport(id) {
   alert('查看报告ID: ' + id);
+}
+
+// ========== 技师管理功能 ==========
+function showTechForm() {
+  document.getElementById('techId').value = '';
+  document.getElementById('techFormTitle').textContent = '添加技师';
+  document.getElementById('techFormElement').reset();
+  showPage('techForm');
+}
+
+function editTech(id) {
+  fetch(API_BASE + '/api/technicians').then(r => r.json()).then(data => {
+    const tech = data.data.find(t => t.id === id);
+    if (tech) {
+      document.getElementById('techId').value = tech.id;
+      document.getElementById('techName').value = tech.realName;
+      document.getElementById('techCertNo').value = tech.certNo;
+      document.getElementById('techWorkYears').value = tech.workYears;
+      document.getElementById('techRating').value = tech.ratingScore;
+      document.getElementById('techPhone').value = tech.phone || '';
+      document.getElementById('techStatus').value = tech.onlineStatus;
+      document.getElementById('techFormTitle').textContent = '编辑技师';
+      showPage('techForm');
+    }
+  });
+}
+
+function viewTech(id) {
+  fetch(API_BASE + '/api/technicians').then(r => r.json()).then(data => {
+    const tech = data.data.find(t => t.id === id);
+    if (tech) {
+      document.getElementById('techDetailContent').innerHTML =
+        '<p><strong>ID:</strong> ' + tech.id + '</p>' +
+        '<p><strong>姓名:</strong> ' + tech.realName + '</p>' +
+        '<p><strong>工号:</strong> ' + tech.certNo + '</p>' +
+        '<p><strong>工作年限:</strong> ' + tech.workYears + '年</p>' +
+        '<p><strong>评分:</strong> ' + tech.ratingScore + '</p>' +
+        '<p><strong>订单数:</strong> ' + tech.orderCount + '</p>' +
+        '<p><strong>余额:</strong> ¥' + tech.balance + '</p>' +
+        '<p><strong>状态:</strong> ' + (tech.onlineStatus ? '在线' : '离线') + '</p>';
+      showPage('techDetail');
+    }
+  });
+}
+
+async function saveTech(e) {
+  e.preventDefault();
+  const id = document.getElementById('techId').value;
+  const data = {
+    realName: document.getElementById('techName').value,
+    certNo: document.getElementById('techCertNo').value,
+    workYears: parseInt(document.getElementById('techWorkYears').value),
+    ratingScore: parseFloat(document.getElementById('techRating').value),
+    phone: document.getElementById('techPhone').value,
+    onlineStatus: parseInt(document.getElementById('techStatus').value)
+  };
+
+  try {
+    const url = id ? API_BASE + '/api/technicians/' + id : API_BASE + '/api/technicians';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.code === 200) {
+      alert(id ? '更新成功' : '添加成功');
+      showPage('technicians');
+      loadTechnicians();
+    } else {
+      alert('操作失败: ' + result.message);
+    }
+  } catch (err) {
+    alert('错误: ' + err.message);
+  }
+}
+
+async function deleteTech(id) {
+  if (!confirm('确定要删除该技师吗？')) return;
+  try {
+    const res = await fetch(API_BASE + '/api/technicians/' + id, { method: 'DELETE' });
+    const result = await res.json();
+    if (result.code === 200) {
+      alert('删除成功');
+      loadTechnicians();
+    } else {
+      alert('删除失败: ' + result.message);
+    }
+  } catch (err) {
+    alert('错误: ' + err.message);
+  }
+}
+
+// ========== 库存管理功能 ==========
+async function loadDeposits() {
+  try {
+    const res = await fetch(API_BASE + '/api/deposits?userId=3');
+    const data = await res.json();
+    const tbody = document.getElementById('depositListBody');
+    if (data.data && data.data.length > 0) {
+      tbody.innerHTML = data.data.map(d => '<tr><td>' + d.id + '</td><td>' + d.batchNo + '</td><td>' + d.userId + '</td><td>' + d.productName + '</td><td>' + d.quantity + '</td><td>' + d.availableQuantity + '</td><td><span class="badge ' + (d.depositStatus === 2 ? 'badge-success' : d.depositStatus === 1 ? 'badge-warning' : 'badge-danger') + '">' + (d.depositStatus === 2 ? '正常' : d.depositStatus === 1 ? '冻结' : '已用完') + '</span></td><td><button class="btn btn-primary" onclick="editDeposit(' + d.id + ')">编辑</button><button class="btn btn-default" onclick="viewDeposit(' + d.id + ')">详情</button><button class="btn btn-danger" onclick="deleteDeposit(' + d.id + ')" style="background:#ff4d4f;color:#fff">删除</button></td></tr>').join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">暂无数据</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('depositListBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">加载失败</td></tr>';
+  }
+}
+
+function showDepositForm() {
+  document.getElementById('depositId').value = '';
+  document.getElementById('depositFormTitle').textContent = '添加库存';
+  document.getElementById('depositFormElement').reset();
+  showPage('depositForm');
+}
+
+function editDeposit(id) {
+  fetch(API_BASE + '/api/deposits?userId=3').then(r => r.json()).then(data => {
+    const d = data.data.find(item => item.id === id);
+    if (d) {
+      document.getElementById('depositId').value = d.id;
+      document.getElementById('depositUserId').value = d.userId;
+      document.getElementById('depositProductName').value = d.productName;
+      document.getElementById('depositQuantity').value = d.quantity;
+      document.getElementById('depositStatus').value = d.depositStatus;
+      document.getElementById('depositFormTitle').textContent = '编辑库存';
+      showPage('depositForm');
+    }
+  });
+}
+
+function viewDeposit(id) {
+  fetch(API_BASE + '/api/deposits?userId=3').then(r => r.json()).then(data => {
+    const d = data.data.find(item => item.id === id);
+    if (d) {
+      document.getElementById('depositDetailContent').innerHTML =
+        '<p><strong>ID:</strong> ' + d.id + '</p>' +
+        '<p><strong>批次号:</strong> ' + d.batchNo + '</p>' +
+        '<p><strong>用户ID:</strong> ' + d.userId + '</p>' +
+        '<p><strong>商品:</strong> ' + d.productName + '</p>' +
+        '<p><strong>总量:</strong> ' + d.quantity + 'ml</p>' +
+        '<p><strong>可用:</strong> ' + d.availableQuantity + 'ml</p>' +
+        '<p><strong>状态:</strong> ' + (d.depositStatus === 2 ? '正常' : d.depositStatus === 1 ? '冻结' : '已用完') + '</p>';
+      showPage('depositDetail');
+    }
+  });
+}
+
+async function saveDeposit(e) {
+  e.preventDefault();
+  const id = document.getElementById('depositId').value;
+  const data = {
+    userId: parseInt(document.getElementById('depositUserId').value),
+    productName: document.getElementById('depositProductName').value,
+    quantity: parseInt(document.getElementById('depositQuantity').value),
+    depositStatus: parseInt(document.getElementById('depositStatus').value)
+  };
+
+  try {
+    const url = id ? API_BASE + '/api/deposits/' + id : API_BASE + '/api/deposits';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.code === 200) {
+      alert(id ? '更新成功' : '添加成功');
+      showPage('deposits');
+      loadDeposits();
+    } else {
+      alert('操作失败: ' + result.message);
+    }
+  } catch (err) {
+    alert('错误: ' + err.message);
+  }
+}
+
+async function deleteDeposit(id) {
+  if (!confirm('确定要删除该库存吗？')) return;
+  try {
+    const res = await fetch(API_BASE + '/api/deposits/' + id, { method: 'DELETE' });
+    const result = await res.json();
+    if (result.code === 200) {
+      alert('删除成功');
+      loadDeposits();
+    } else {
+      alert('删除失败: ' + result.message);
+    }
+  } catch (err) {
+    alert('错误: ' + err.message);
+  }
 }
 </script>
 </body>
@@ -739,10 +1021,147 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 添加技师
+  if (path === '/api/technicians' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const newTech = {
+          id: technicians.length > 0 ? Math.max(...technicians.map(t => t.id)) + 1 : 1,
+          realName: data.realName,
+          certNo: data.certNo || 'TECH' + Date.now(),
+          workYears: data.workYears || 0,
+          ratingScore: data.ratingScore || 5.0,
+          orderCount: 0,
+          balance: 0,
+          onlineStatus: data.onlineStatus !== undefined ? data.onlineStatus : 1,
+          avatar: '',
+          phone: data.phone || ''
+        };
+        technicians.push(newTech);
+        jsonResponse(res, { code: 200, data: { id: newTech.id, message: '技师添加成功' } });
+      } catch (err) {
+        jsonResponse(res, { code: 500, message: '添加失败: ' + err.message });
+      }
+    });
+    return;
+  }
+
+  // 更新技师
+  if (path.startsWith('/api/technicians/') && method === 'PUT') {
+    const techId = parseInt(path.split('/')[3]);
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const tech = technicians.find(t => t.id === techId);
+        if (tech) {
+          tech.realName = data.realName || tech.realName;
+          tech.certNo = data.certNo || tech.certNo;
+          tech.workYears = data.workYears !== undefined ? data.workYears : tech.workYears;
+          tech.ratingScore = data.ratingScore !== undefined ? data.ratingScore : tech.ratingScore;
+          tech.onlineStatus = data.onlineStatus !== undefined ? data.onlineStatus : tech.onlineStatus;
+          tech.phone = data.phone || tech.phone;
+          jsonResponse(res, { code: 200, message: '技师更新成功' });
+        } else {
+          jsonResponse(res, { code: 404, message: '技师不存在' });
+        }
+      } catch (err) {
+        jsonResponse(res, { code: 500, message: '更新失败: ' + err.message });
+      }
+    });
+    return;
+  }
+
+  // 删除技师
+  if (path.startsWith('/api/technicians/') && method === 'DELETE') {
+    const techId = parseInt(path.split('/')[3]);
+    const index = technicians.findIndex(t => t.id === techId);
+    if (index > -1) {
+      technicians.splice(index, 1);
+      jsonResponse(res, { code: 200, message: '技师删除成功' });
+    } else {
+      jsonResponse(res, { code: 404, message: '技师不存在' });
+    }
+    return;
+  }
+
+  // 获取库存列表（支持查询所有或按用户）
   if (path === '/api/deposits' && method === 'GET') {
     const userId = parsedUrl.query.userId;
-    const userDeposits = deposits.filter(d => d.userId == userId && d.depositStatus === 2);
-    jsonResponse(res, { code: 200, data: userDeposits });
+    if (userId) {
+      const userDeposits = deposits.filter(d => d.userId == userId);
+      jsonResponse(res, { code: 200, data: userDeposits });
+    } else {
+      jsonResponse(res, { code: 200, data: deposits });
+    }
+    return;
+  }
+
+  // 添加库存
+  if (path === '/api/deposits' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const newDeposit = {
+          id: deposits.length > 0 ? Math.max(...deposits.map(d => d.id)) + 1 : 1,
+          batchNo: 'DP' + new Date().toISOString().slice(0,10).replace(/-/g,'') + String(deposits.length + 1).padStart(4,'0'),
+          userId: data.userId,
+          productId: 1,
+          productName: data.productName,
+          quantity: data.quantity,
+          availableQuantity: data.quantity,
+          depositStatus: data.depositStatus !== undefined ? data.depositStatus : 2
+        };
+        deposits.push(newDeposit);
+        jsonResponse(res, { code: 200, data: { id: newDeposit.id, batchNo: newDeposit.batchNo, message: '库存添加成功' } });
+      } catch (err) {
+        jsonResponse(res, { code: 500, message: '添加失败: ' + err.message });
+      }
+    });
+    return;
+  }
+
+  // 更新库存
+  if (path.startsWith('/api/deposits/') && method === 'PUT') {
+    const depositId = parseInt(path.split('/')[3]);
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const deposit = deposits.find(d => d.id === depositId);
+        if (deposit) {
+          deposit.userId = data.userId !== undefined ? data.userId : deposit.userId;
+          deposit.productName = data.productName || deposit.productName;
+          deposit.quantity = data.quantity !== undefined ? data.quantity : deposit.quantity;
+          deposit.depositStatus = data.depositStatus !== undefined ? data.depositStatus : deposit.depositStatus;
+          jsonResponse(res, { code: 200, message: '库存更新成功' });
+        } else {
+          jsonResponse(res, { code: 404, message: '库存不存在' });
+        }
+      } catch (err) {
+        jsonResponse(res, { code: 500, message: '更新失败: ' + err.message });
+      }
+    });
+    return;
+  }
+
+  // 删除库存
+  if (path.startsWith('/api/deposits/') && method === 'DELETE') {
+    const depositId = parseInt(path.split('/')[3]);
+    const index = deposits.findIndex(d => d.id === depositId);
+    if (index > -1) {
+      deposits.splice(index, 1);
+      jsonResponse(res, { code: 200, message: '库存删除成功' });
+    } else {
+      jsonResponse(res, { code: 404, message: '库存不存在' });
+    }
     return;
   }
 
