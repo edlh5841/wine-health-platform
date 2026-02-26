@@ -76,43 +76,229 @@ const healthReportTemplate = {
   }
 };
 
-// 管理后台 HTML - 简化版
+// 管理后台 HTML - 完整版
 const adminHtml = `<!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>管理后台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保健酒平台 - 管理后台</title>
 <style>
-body{font-family:sans-serif;background:#f5f5f5;padding:40px}
-.box{max-width:400px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-h1{color:#C53D13;text-align:center}
-input{width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
-button{width:100%;padding:12px;background:#C53D13;color:#fff;border:none;border-radius:4px;cursor:pointer}
-.success{text-align:center;padding:40px}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f0f2f5; }
+.login-container { height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-box { width: 360px; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.login-box h1 { color: #C53D13; text-align: center; margin-bottom: 30px; font-size: 24px; }
+.login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; }
+.login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #C53D13 0%, #E55A2B 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+.admin-container { display: none; min-height: 100vh; }
+.sidebar { position: fixed; left: 0; top: 0; width: 200px; height: 100vh; background: #304156; color: #fff; }
+.sidebar .logo { height: 60px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #1f2d3d; }
+.sidebar .menu { padding: 20px 0; }
+.sidebar .menu-item { padding: 15px 20px; cursor: pointer; transition: all 0.3s; }
+.sidebar .menu-item:hover, .sidebar .menu-item.active { background: #263445; }
+.sidebar .menu-item i { margin-right: 10px; }
+.main-content { margin-left: 200px; padding: 20px; }
+.header { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.stat-value { font-size: 28px; font-weight: bold; color: #C53D13; }
+.stat-label { color: #666; margin-top: 5px; font-size: 14px; }
+.content-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.content-card h3 { margin-bottom: 20px; color: #333; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+th { background: #fafafa; font-weight: 600; color: #666; }
+.badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; }
+.badge-success { background: #f6ffed; color: #52c41a; }
+.badge-warning { background: #fff7e6; color: #fa8c16; }
+.badge-danger { background: #fff1f0; color: #ff4d4f; }
+.btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 8px; }
+.btn-primary { background: #C53D13; color: #fff; }
+.btn-default { background: #f0f0f0; color: #333; }
+.page-section { display: none; }
+.page-section.active { display: block; }
 </style>
 </head>
 <body>
-<div id="loginBox" class="box">
-<h1>管理后台</h1>
-<p>账号: admin<br>密码: admin123</p>
-<input type="text" id="u" placeholder="用户名">
-<input type="password" id="p" placeholder="密码">
-<button onclick="login()">登录</button>
+<div class="login-container" id="loginPage">
+  <div class="login-box">
+    <h1>🍷 管理后台</h1>
+    <input type="text" id="username" placeholder="用户名" value="admin">
+    <input type="password" id="password" placeholder="密码" value="admin123">
+    <button onclick="doLogin()">登录</button>
+  </div>
 </div>
-<div id="successBox" class="success" style="display:none">
-<h1 style="color:#C53D13">欢迎进入管理后台</h1>
-<p><a href="/">返回首页</a></p>
+
+<div class="admin-container" id="adminPage">
+  <div class="sidebar">
+    <div class="logo">保健酒平台</div>
+    <div class="menu">
+      <div class="menu-item active" onclick="showPage('dashboard')">📊 数据概览</div>
+      <div class="menu-item" onclick="showPage('technicians')">👨‍⚕️ 技师管理</div>
+      <div class="menu-item" onclick="showPage('orders')">📋 订单管理</div>
+      <div class="menu-item" onclick="showPage('reports')">📄 体检报告</div>
+      <div class="menu-item" onclick="doLogout()">🚪 退出登录</div>
+    </div>
+  </div>
+  
+  <div class="main-content">
+    <div class="header">
+      <h2 id="pageTitle">数据概览</h2>
+      <span>管理员: admin</span>
+    </div>
+    
+    <!-- 数据概览 -->
+    <div class="page-section active" id="dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="statTechs">3</div><div class="stat-label">技师总数</div></div>
+        <div class="stat-card"><div class="stat-value" id="statOrders">0</div><div class="stat-label">今日订单</div></div>
+        <div class="stat-card"><div class="stat-value" id="statIncome">¥0</div><div class="stat-label">今日收入</div></div>
+        <div class="stat-card"><div class="stat-value" id="statReports">0</div><div class="stat-label">体检报告</div></div>
+      </div>
+      <div class="content-card">
+        <h3>最近订单</h3>
+        <table>
+          <thead><tr><th>订单号</th><th>客户</th><th>技师</th><th>金额</th><th>状态</th></tr></thead>
+          <tbody id="recentOrders"><tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 技师管理 -->
+    <div class="page-section" id="technicians">
+      <div class="content-card">
+        <h3>技师列表</h3>
+        <table>
+          <thead><tr><th>ID</th><th>姓名</th><th>工号</th><th>评分</th><th>订单数</th><th>余额</th><th>状态</th></tr></thead>
+          <tbody id="techListBody"><tr><td colspan="7" style="text-align:center;color:#999">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 订单管理 -->
+    <div class="page-section" id="orders">
+      <div class="content-card">
+        <h3>所有订单</h3>
+        <table>
+          <thead><tr><th>订单号</th><th>客户ID</th><th>技师</th><th>金额</th><th>状态</th><th>创建时间</th></tr></thead>
+          <tbody id="orderListBody"><tr><td colspan="6" style="text-align:center;color:#999">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 体检报告 -->
+    <div class="page-section" id="reports">
+      <div class="content-card">
+        <h3>体检报告列表</h3>
+        <table>
+          <thead><tr><th>ID</th><th>用户</th><th>医院</th><th>日期</th><th>结论</th><th>操作</th></tr></thead>
+          <tbody id="reportListBody"><tr><td colspan="6" style="text-align:center;color:#999">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
+
 <script>
-function login(){
-  var u = document.getElementById('u').value;
-  var p = document.getElementById('p').value;
-  if(u === 'admin' && p === 'admin123'){
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('successBox').style.display = 'block';
-  }else{
+const API_BASE = window.location.origin.replace('/admin.html', '');
+
+function doLogin() {
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  if (u === 'admin' && p === 'admin123') {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPage').style.display = 'block';
+    loadDashboardData();
+  } else {
     alert('账号或密码错误');
   }
+}
+
+function doLogout() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('adminPage').style.display = 'none';
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const titles = { dashboard: '数据概览', technicians: '技师管理', orders: '订单管理', reports: '体检报告' };
+  document.getElementById('pageTitle').textContent = titles[page];
+  
+  if (page === 'technicians') loadTechnicians();
+  if (page === 'orders') loadOrders();
+  if (page === 'reports') loadReports();
+}
+
+async function loadDashboardData() {
+  try {
+    const [techRes, orderRes, reportRes] = await Promise.all([
+      fetch(API_BASE + '/api/technicians'),
+      fetch(API_BASE + '/api/orders'),
+      fetch(API_BASE + '/api/health-report/list?userId=3')
+    ]);
+    
+    const techData = await techRes.json();
+    const reportData = await reportRes.json();
+    
+    document.getElementById('statTechs').textContent = techData.data ? techData.data.length : 0;
+    document.getElementById('statReports').textContent = reportData.data ? reportData.data.length : 0;
+  } catch (e) {
+    console.error('加载数据失败:', e);
+  }
+}
+
+async function loadTechnicians() {
+  try {
+    const res = await fetch(API_BASE + '/api/technicians');
+    const data = await res.json();
+    const tbody = document.getElementById('techListBody');
+    if (data.data && data.data.length > 0) {
+      tbody.innerHTML = data.data.map(t => '<tr><td>' + t.id + '</td><td>' + t.realName + '</td><td>' + t.certNo + '</td><td>' + t.ratingScore + '</td><td>' + t.orderCount + '</td><td>¥' + t.balance + '</td><td><span class="badge ' + (t.onlineStatus ? 'badge-success' : 'badge-default') + '">' + (t.onlineStatus ? '在线' : '离线') + '</span></td></tr>').join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">暂无数据</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('techListBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">加载失败</td></tr>';
+  }
+}
+
+async function loadOrders() {
+  try {
+    const res = await fetch(API_BASE + '/api/orders');
+    const data = await res.json();
+    const tbody = document.getElementById('orderListBody');
+    if (data.data && data.data.length > 0) {
+      tbody.innerHTML = data.data.map(o => '<tr><td>' + o.orderNo + '</td><td>' + o.userId + '</td><td>' + o.technicianName + '</td><td>¥' + o.amount + '</td><td><span class="badge ' + (o.status === 3 ? 'badge-success' : o.status === 1 ? 'badge-warning' : 'badge-danger') + '">' + (o.status === 3 ? '已完成' : o.status === 1 ? '进行中' : '待支付') + '</span></td><td>' + o.createTime + '</td></tr>').join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999">暂无订单</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('orderListBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999">加载失败</td></tr>';
+  }
+}
+
+async function loadReports() {
+  try {
+    const res = await fetch(API_BASE + '/api/health-report/list?userId=3');
+    const data = await res.json();
+    const tbody = document.getElementById('reportListBody');
+    if (data.data && data.data.length > 0) {
+      tbody.innerHTML = data.data.map(r => '<tr><td>' + r.id + '</td><td>' + r.data.basicInfo.name + '</td><td>' + r.data.basicInfo.hospital + '</td><td>' + r.data.basicInfo.reportDate + '</td><td>' + r.data.conclusion.summary + '</td><td><button class="btn btn-primary" onclick="viewReport(' + r.id + ')">查看</button></td></tr>').join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999">暂无报告</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('reportListBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999">加载失败</td></tr>';
+  }
+}
+
+function viewReport(id) {
+  alert('查看报告ID: ' + id);
 }
 </script>
 </body>
@@ -557,6 +743,19 @@ const server = http.createServer((req, res) => {
     const userId = parsedUrl.query.userId;
     const userDeposits = deposits.filter(d => d.userId == userId && d.depositStatus === 2);
     jsonResponse(res, { code: 200, data: userDeposits });
+    return;
+  }
+
+  // 获取所有订单（管理后台用）
+  if (path === '/api/orders' && method === 'GET') {
+    const ordersWithTechName = orders.map(o => {
+      const tech = technicians.find(t => t.id === o.technicianId);
+      return {
+        ...o,
+        technicianName: tech ? tech.realName : '未知'
+      };
+    });
+    jsonResponse(res, { code: 200, data: ordersWithTechName });
     return;
   }
 
