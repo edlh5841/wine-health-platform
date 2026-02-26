@@ -168,7 +168,7 @@ const testPageHtml = `
     <div class="card">
       <h2>6. 管理后台</h2>
       <p>账号: admin / 密码: admin123</p>
-      <a href="/admin" target="_blank"><button class="btn">打开管理后台</button></a>
+      <a href="/admin.html" target="_blank"><button class="btn">打开管理后台</button></a>
     </div>
   </div>
 
@@ -345,7 +345,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 管理后台页面 - 直接返回登录页
-  if (path === '/admin') {
+  if (path === '/admin' || path === '/admin.html') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(adminHtml);
     return;
