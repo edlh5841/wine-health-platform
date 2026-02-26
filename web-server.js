@@ -16,83 +16,8 @@ const deposits = [
 const orders = [];
 let orderIdCounter = 1;
 
-// 管理后台 HTML
-const adminHtml = `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>保健酒平台 - 管理后台</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #f0f2f5; }
-    .login-box { max-width: 400px; margin: 100px auto; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    h1 { color: #C53D13; text-align: center; margin-bottom: 30px; font-size: 24px; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; }
-    button { width: 100%; padding: 12px; background: linear-gradient(135deg, #C53D13 0%, #E55A2B 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 20px; }
-    button:hover { opacity: 0.9; }
-    .dashboard { display: none; padding: 20px; }
-    .header { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
-    .stat-card { background: #fff; padding: 20px; border-radius: 12px; text-align: center; }
-    .stat-value { font-size: 32px; font-weight: bold; color: #C53D13; }
-    .stat-label { color: #666; margin-top: 5px; }
-    table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; }
-    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-    th { background: #fafafa; font-weight: 600; }
-    .badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; }
-    .badge-success { background: #f6ffed; color: #52c41a; }
-    .badge-warning { background: #fff7e6; color: #fa8c16; }
-  </style>
-</head>
-<body>
-  <div class="login-box" id="loginBox">
-    <h1>🍷 保健酒平台管理后台</h1>
-    <input type="text" id="username" placeholder="用户名" value="admin">
-    <input type="password" id="password" placeholder="密码" value="admin123">
-    <button onclick="login()">登录</button>
-  </div>
-  
-  <div class="dashboard" id="dashboard">
-    <div class="header">
-      <h2>管理后台</h2>
-      <button onclick="logout()" style="width: auto; padding: 8px 20px; margin: 0;">退出</button>
-    </div>
-    <div class="stats">
-      <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">技师总数</div></div>
-      <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">今日订单</div></div>
-      <div class="stat-card"><div class="stat-value">¥1,500</div><div class="stat-label">今日收入</div></div>
-      <div class="stat-card"><div class="stat-value">98%</div><div class="stat-label">好评率</div></div>
-    </div>
-    <table>
-      <thead><tr><th>订单号</th><th>客户</th><th>技师</th><th>金额</th><th>状态</th></tr></thead>
-      <tbody>
-        <tr><td>W202402260001</td><td>张三</td><td>王师傅</td><td>¥299</td><td><span class="badge badge-success">已完成</span></td></tr>
-        <tr><td>W202402260002</td><td>李四</td><td>李师傅</td><td>¥399</td><td><span class="badge badge-warning">待核销</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <script>
-    function login() {
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
-      if (u === 'admin' && p === 'admin123') {
-        document.getElementById('loginBox').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-      } else {
-        alert('账号或密码错误');
-      }
-    }
-    function logout() {
-      document.getElementById('loginBox').style.display = 'block';
-      document.getElementById('dashboard').style.display = 'none';
-    }
-  </script>
-</body>
-</html>
-`;
+// 管理后台 HTML - 简化版
+const adminHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>管理后台</title><style>body{font-family:sans-serif;background:#f5f5f5;padding:40px}.box{max-width:400px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}h1{color:#C53D13;text-align:center}input{width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}button{width:100%;padding:12px;background:#C53D13;color:#fff;border:none;border-radius:4px;cursor:pointer}</style></head><body><div class="box"><h1>管理后台</h1><p>账号: admin<br>密码: admin123</p><input type="text" id="u" placeholder="用户名"><input type="password" id="p" placeholder="密码"><button onclick="l()">登录</button></div><script>function l(){if(document.getElementById('u').value==='admin'&&document.getElementById('p').value==='admin123'){document.body.innerHTML='<h1 style="text-align:center;color:#C53D13">欢迎进入管理后台</h1><p style="text-align:center"><a href="/">返回首页</a></p>';}else{alert('错误');}}</script></body></html>`;
 
 // HTML 测试页面
 const testPageHtml = `
