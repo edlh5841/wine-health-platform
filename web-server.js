@@ -17,7 +17,46 @@ const orders = [];
 let orderIdCounter = 1;
 
 // 管理后台 HTML - 简化版
-const adminHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>管理后台</title><style>body{font-family:sans-serif;background:#f5f5f5;padding:40px}.box{max-width:400px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}h1{color:#C53D13;text-align:center}input{width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}button{width:100%;padding:12px;background:#C53D13;color:#fff;border:none;border-radius:4px;cursor:pointer}</style></head><body><div class="box"><h1>管理后台</h1><p>账号: admin<br>密码: admin123</p><input type="text" id="u" placeholder="用户名"><input type="password" id="p" placeholder="密码"><button onclick="l()">登录</button></div><script>function l(){if(document.getElementById('u').value==='admin'&&document.getElementById('p').value==='admin123'){document.body.innerHTML='<h1 style="text-align:center;color:#C53D13">欢迎进入管理后台</h1><p style="text-align:center"><a href="/">返回首页</a></p>';}else{alert('错误');}}</script></body></html>`;
+const adminHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>管理后台</title>
+<style>
+body{font-family:sans-serif;background:#f5f5f5;padding:40px}
+.box{max-width:400px;margin:0 auto;background:#fff;padding:40px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+h1{color:#C53D13;text-align:center}
+input{width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:4px;box-sizing:border-box}
+button{width:100%;padding:12px;background:#C53D13;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.success{text-align:center;padding:40px}
+</style>
+</head>
+<body>
+<div id="loginBox" class="box">
+<h1>管理后台</h1>
+<p>账号: admin<br>密码: admin123</p>
+<input type="text" id="u" placeholder="用户名">
+<input type="password" id="p" placeholder="密码">
+<button onclick="login()">登录</button>
+</div>
+<div id="successBox" class="success" style="display:none">
+<h1 style="color:#C53D13">欢迎进入管理后台</h1>
+<p><a href="/">返回首页</a></p>
+</div>
+<script>
+function login(){
+  var u = document.getElementById('u').value;
+  var p = document.getElementById('p').value;
+  if(u === 'admin' && p === 'admin123'){
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+  }else{
+    alert('账号或密码错误');
+  }
+}
+</script>
+</body>
+</html>`;
 
 // HTML 测试页面
 const testPageHtml = `
